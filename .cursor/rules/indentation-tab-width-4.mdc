@@ -1,0 +1,35 @@
+---
+description: Treat one indentation level and tab width as four spaces
+alwaysApply: true
+---
+
+# Indentation: four spaces per level
+
+Use **four spaces** as the width of **one indentation level** everywhere in this project.
+
+## Tabs vs spaces
+
+- If the file or toolchain uses **tab characters** (`\t`), they must be **equivalent to four spaces**: editor tab size **4**, and nested structure should read as multiples of 4 columns.
+- If the file uses **spaces**, indent with **4 spaces** per level (not 2).
+
+## Examples
+
+```typescript
+// ✅ GOOD: each nested block +4 spaces (or one tab = 4 columns)
+function example() {
+    if (condition) {
+        doWork();
+    }
+}
+```
+
+```typescript
+// ❌ BAD: 2-space indent when project standard is 4
+function example() {
+  if (condition) {
+    doWork();
+  }
+}
+```
+
+When editing, set **Tab Size** and **Indent** to **4** so aligns with collaborators and formatters.

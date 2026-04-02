@@ -1,0 +1,41 @@
+---
+description: Keep functions and components to ~7 statements; exclude certain lines and merge JSX tags
+globs: "**/*.{ts,tsx,js,jsx}"
+alwaysApply: false
+---
+
+# Concise functions and components (~7 statements)
+
+Aim for **about seven counted statements** per function or component body, with reasonable flexibility when splitting would hurt clarity.
+
+## What counts as one statement (JS/TS)
+
+- A control-flow line (`if`, `else`, `return`, `throw`, `break`, `continue`, `switch` / `case`).
+- A function call used for side effects or as the main expression of a step (e.g. `doThing()`, `setState(x)`).
+- A **`const` / reassignment whose right-hand side is not a primitive literal** (e.g. `const user = await loadUser()` counts; see exclusions below).
+
+## What does **not** count
+
+- **Literal assignments**: bindings whose whole initializer is a literal — primitives (`let x = 5`), strings, `true`/`false`/`null`/`undefined`, object literals (`{}`), array literals (`[]`), regex literals, and simple template literals with no `${…}`.
+- **Constructor calls**: e.g. `new Date()`, `new Map()`, `new Something()` — do not increment the count.
+- **Top line of `for` loops**: only the first line of the loop header (initialization / `for (` … `)` opening) is excluded; the loop **body** statements still count as usual.
+
+## JSX / markup
+
+Treat each **matching open/close tag pair** (or self-closing element) as **one statement**, not two. Example: `<div>...</div>` → 1; `<img />` → 1.
+
+## When to bend the rule
+
+Prefer extracting helpers, hooks, or child components rather than inflating one function. If a small overrun keeps the code easier to follow, that is acceptable.
+
+```tsx
+// ✅ GOOD: short component; heavy logic in a hook or helper
+function UserCard({ id }: { id: string }) {
+  const { user, error } = useUser(id);
+  if (error) return <ErrorBanner message={error.message} />;
+  if (!user) return <Spinner />;
+  return <UserCardView user={user} />;
+}
+
+// ❌ BAD: one huge component with many counted steps — split instead
+```
