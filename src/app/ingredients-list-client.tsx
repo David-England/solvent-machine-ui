@@ -8,7 +8,6 @@ export function IngredientsListClient() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        let cancelled = false;
         (async () => {
             try {
                 const res = await fetch("/api/ingredients-list");
@@ -35,18 +34,11 @@ export function IngredientsListClient() {
                 if (!list.every(x => typeof x === "string")) {
                     throw new Error("Invalid ingredient names in response.");
                 }
-                if (!cancelled) {
-                    setNames(list as string[]);
-                }
+                setNames(list as string[]);
             } catch (e) {
-                if (!cancelled) {
-                    setError(e instanceof Error ? e.message : "Failed to load ingredients.");
-                }
+                setError(e instanceof Error ? e.message : "Failed to load ingredients.");
             }
         })();
-        return () => {
-            cancelled = true;
-        };
     }, []);
 
     if (error) {
