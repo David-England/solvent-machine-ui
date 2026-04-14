@@ -2,7 +2,37 @@
 
 import { useEffect, useState } from "react";
 
-// TODO: break apart this component
+function getErrorMessageFromResponse(data: unknown, status: number): string {
+    if (
+        data &&
+        typeof data === "object" &&
+        "error" in data &&
+        typeof (data as { error: unknown }).error === "string"
+    ) {
+        return (data as { error: string }).error;
+    }
+
+    return `Request failed (${status})`;
+}
+
+function getIngredientNamesFromResponse(data: unknown): string[] {
+    if (
+        !data ||
+        typeof data !== "object" ||
+        !("names" in data) ||
+        !Array.isArray((data as { names: unknown }).names)
+    ) {
+        throw new Error("Unexpected response from /api/ingredients-list.");
+    }
+
+    const list = (data as { names: unknown[] }).names;
+    if (!list.every((x) => typeof x === "string")) {
+        throw new Error("Invalid ingredient names in response.");
+    }
+
+    return list as string[];
+}
+
 export function IngredientsListClient() {
     const [names, setNames] = useState<string[] | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -13,28 +43,9 @@ export function IngredientsListClient() {
                 const res = await fetch("/api/ingredients-list");
                 const data: unknown = await res.json();
                 if (!res.ok) {
-                    const msg =
-                        data &&
-                        typeof data === "object" &&
-                        "error" in data &&
-                        typeof (data as { error: unknown }).error === "string"
-                            ? (data as { error: string }).error
-                            : `Request failed (${res.status})`;
-                    throw new Error(msg);
+                    throw new Error(getErrorMessageFromResponse(data, res.status));
                 }
-                if (
-                    !data ||
-                    typeof data !== "object" ||
-                    !("names" in data) ||
-                    !Array.isArray((data as { names: unknown }).names)
-                ) {
-                    throw new Error("Unexpected response from /api/ingredients-list.");
-                }
-                const list = (data as { names: unknown[] }).names;
-                if (!list.every(x => typeof x === "string")) {
-                    throw new Error("Invalid ingredient names in response.");
-                }
-                setNames(list as string[]);
+                setNames(getIngredientNamesFromResponse(data));
             } catch (e) {
                 setError(e instanceof Error ? e.message : "Failed to load ingredients.");
             }
