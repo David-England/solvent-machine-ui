@@ -63,10 +63,10 @@ export function IngredientsListClient() {
     }
     return (
         <ul style={{ fontFamily: "Arial, sans-serif", paddingLeft: "1.5rem" }}>
-            {names.map((name) => (
+            {names.map(
                 // TODO: make key robust to duplicates
-                <li key={name}>{name}</li>
-            ))}
+                n => <li key={n}>{n}</li>
+            )}
         </ul>
     );
 }
